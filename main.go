@@ -39,13 +39,17 @@ func main() {
 }
 
 func web_http_client(w http.ResponseWriter, r *http.Request) {
-	ip := r.URL.Query().Get("ip")
-	if ip == "" {
+	client_ip := r.URL.Query().Get("ip")
+	var ip string
+	if client_ip == "" {
 		ip = exnet.ClientPublicIP(r)
+	} else {
+		ip = client_ip
 	}
 	ip_data, _ := qqwry.QueryIP(ip)
 	fmt.Println(
 		nowtime(),
+		"客户端ip", ip,
 		"IP:", ip_data.IP,
 		"地区：", ip_data.Country,
 		"省份：", ip_data.Province,
