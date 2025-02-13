@@ -1,0 +1,47 @@
+name: Build Go Project
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        arch: [amd64, arm64]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.24' # 使用Go 1.24版本
+
+      - name: Build for ${{ matrix.os }} ${{ matrix.arch }}
+        shell: bash
+        run: |
+          repo_full_name="${{ github.repository }}"
+          repo_name=$(echo "$repo_full_name" | cut -d'/' -f2)
+          export GOARCH=${{ matrix.arch }}
+          echo "运行平台/架构：$RUNNER_OS/$GOARCH"
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            export GOOS=windows
+            suffix='.exe'
+          elif [ "$RUNNER_OS" = "Linux" ]; then
+            export GOOS=linux
+            suffix=''
+          elif [ "$RUNNER_OS" = "macos" ]; then
+            export GOOS=macos
+            suffix=''
+          fi
+          go build -o output/${repo_name}_${{ matrix.os }}_${{ matrix.arch }}${suffix} main.go
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}_${{ matrix.arch }}
+          path: output/*
