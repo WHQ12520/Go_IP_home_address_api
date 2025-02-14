@@ -34,7 +34,7 @@ jobs:
           elif [ "$RUNNER_OS" = "Linux" ]; then
             export GOOS=linux
             suffix=''
-          elif [ "$RUNNER_OS" = "macos" ]; then
+          elif [ "$RUNNER_OS" = "macOS" ]; then
             export GOOS=macos
             suffix=''
           fi
